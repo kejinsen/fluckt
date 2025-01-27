@@ -196,14 +196,14 @@ class Framework(nn.Module):
         self.max_distance = max_distance
         self.emb_type = emb_type
 
-        if self.emb_type.find("mamba") != -1:
-            self.mamba_layer1 = Mamba(
-                d_model=self.d_model,  # 模型维度，应该与embedding维度匹配
-                d_state=d_state,  # 状态扩展因子，可以根据需要调整
-                d_conv=d_conv,  # 局部卷积宽度
-                expand=expand,  # 块扩展因子
-            )
-            # print(f"{d_state},{d_conv},{expand}")
+        # if self.emb_type.find("mamba") != -1:
+        #     self.mamba_layer1 = Mamba(
+        #         d_model=self.d_model,  # 模型维度，应该与embedding维度匹配
+        #         d_state=d_state,  # 状态扩展因子，可以根据需要调整
+        #         d_conv=d_conv,  # 局部卷积宽度
+        #         expand=expand,  # 块扩展因子
+        #     )
+        #     # print(f"{d_state},{d_conv},{expand}")
 
         if self.emb_type.find("conv") != -1:
             self.filter_layer = FrequencyLayer(dropout,d_model,kernel_size)
@@ -237,9 +237,9 @@ class Framework(nn.Module):
         seqlen, batch_size = y.size(1), y.size(0)
         x = q_pos_embed
 
-        if self.emb_type.find("mamba") != -1:
-            x = self.mamba_layer1(x)
-            y = self.mamba_layer1(y)
+        # if self.emb_type.find("mamba") != -1:
+        #     x = self.mamba_layer1(x)
+        #     y = self.mamba_layer1(y)
 
         if self.emb_type.find("conv") != -1:
             x = self.filter_layer(x)
@@ -418,9 +418,9 @@ class MultiHeadAttention(nn.Module):
             if self.emb_type.find("pdiff") == -1:
                 pdiff = None
             if self.emb_type in ["qid_conv_kerple","qid_conv_ker_noexp"]:
-                scores = attention(q=q, k=k, v=v, d_k=self.d_k,mask=mask, dropout=self.dropout, zero_pad=zero_pad, gamma=gammas, pdiff=pdiff, alibi = self.alibi,emb_type=self.emb_type, rel_pos_bias=self.rel_pos_bias, rotary_pe=self.rotary_pe, bar_d=self.bar_d,kernel_bias=self.kernel_bias)
+                scores = attention(q=q, k=k, v=v, d_k=self.d_k,mask=mask, dropout=self.dropout, zero_pad=zero_pad, gamma=gammas, pdiff=pdiff, alibi = self.alibi,emb_type=self.emb_type, bar_d=self.bar_d,kernel_bias=self.kernel_bias)
             else:
-                scores = attention(q=q, k=k, v=v, d_k=self.d_k,mask=mask, dropout=self.dropout, zero_pad=zero_pad, gamma=gammas, pdiff=pdiff, alibi = self.alibi,emb_type=self.emb_type, rel_pos_bias=self.rel_pos_bias, rotary_pe=self.rotary_pe, bar_d=self.bar_d)
+                scores = attention(q=q, k=k, v=v, d_k=self.d_k,mask=mask, dropout=self.dropout, zero_pad=zero_pad, gamma=gammas, pdiff=pdiff, alibi = self.alibi,emb_type=self.emb_type, bar_d=self.bar_d)
 
             # concatenate heads and put through final linear layer
             concat = scores.transpose(1, 2).contiguous()\
